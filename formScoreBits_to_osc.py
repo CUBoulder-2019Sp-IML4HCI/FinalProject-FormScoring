@@ -28,16 +28,13 @@ S = Sender()
 while(True):
     line = ser.readline().decode('utf8').strip()
 
-    message = map(float, line.split("^"))
+    message = list(map(float, line.split("^")))
     tag = message[0]
     if tag == "a":
-        S.output[0:2] = message[1:3]
+        S.output[0:3] = message[0:3]
     elif tag == "b":
-        S.output[3:5] = message[1:3]
-    elif tag == "alpha":
-        S.output[6] = message[1]
-    else: #tag == beta
-        S.output[7] = message[1]
+        S.output[4:7] = message[0:3]
+
  
     S.send()
 
