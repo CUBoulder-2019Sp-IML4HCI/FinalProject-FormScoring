@@ -4,23 +4,43 @@
  
 import serial
 from pythonosc import udp_client
- 
+
+class Sender:
+    def __init__(self):
+        self.output = [None]*8
+        self.send = self.wait_for_fill
+    def wait_for_fill(self):
+        if None in self.output:
+            print("Waiting on full output.")
+        else:
+            self.send = self.send_signal
+    def send_signal(self):
+        print(self.output)
+        client.send_message("/final", self.output)
+
+
 # change this string depending upon where your computer makes a device for the micro:bit
 serialport = "/dev/cu.usbmodem14302"
  
 ser = serial.Serial(serialport, 115200)
 client = udp_client.SimpleUDPClient("localhost", 8999)
- 
+S = Sender()
 while(True):
     line = ser.readline().decode('utf8').strip()
+
+    message = map(float, line.split("^"))
+    tag = message[0]
+    if tag == "a":
+        S.output[0:2] = message[1:3]
+    elif tag == "b":
+        S.output[3:5] = message[1:3]
+    elif tag == "alpha":
+        S.output[6] = message[1]
+    else: #tag == beta
+        S.output[7] = message[1]
  
-    if line.count('^') != 2: continue
- 
-    x, y, z = map(float, line.split("^"))
- 
-    print(f"({x}, {y}, {z})")
- 
-    client.send_message("/wand_accel", [x, y, z] )
+    S.send()
+
 
 #import serial
 #from pythonosc import udp_client
