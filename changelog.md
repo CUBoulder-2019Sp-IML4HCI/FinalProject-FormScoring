@@ -21,5 +21,6 @@
 
 03-17-2019 Ian Wilkins: -Create first working microbit 'a' and 'b' hex
                         -Update python OSC server to interpret messages from microbit 'a' and 'b'
+                        
 03-20-2019 Both:        -Created youtube video
                         -Link: https://youtu.be/LxvbDUXSePE
