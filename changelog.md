@@ -16,6 +16,11 @@
                          2 microbits communicating independently with the receiver.
                         -Begin prototyping signal strength reading
                         -Begin new python OSC server to handle new message format.
+                        
+03-14-2019 Garrett Sippel:-Wrote ocs handler
 
 03-17-2019 Ian Wilkins: -Create first working microbit 'a' and 'b' hex
                         -Update python OSC server to interpret messages from microbit 'a' and 'b'
+                        
+03-20-2019 Both:        -Created youtube video
+                        -Link: https://youtu.be/LxvbDUXSePE
