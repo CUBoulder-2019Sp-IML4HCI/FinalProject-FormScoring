@@ -6,7 +6,7 @@ import serial
 from pythonosc import udp_client
  
 # change this string depending upon where your computer makes a device for the micro:bit
-serialport = "/dev/ttyACM1"
+serialport = "/dev/ttyACM0"
  
 ser = serial.Serial(serialport, 115200)
 client = udp_client.SimpleUDPClient("localhost", 8999)
