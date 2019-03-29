@@ -1,0 +1,21 @@
+from tkinter import *
+
+root = Tk()
+topFrame = Frame(root)
+topFrame.pack(fill=X)
+bottomFrame = Frame(root)
+bottomFrame.pack(side=BOTTOM)
+l = Label(topFrame,text="Hello Tkinter")
+l2 = Label(bottomFrame,text="Bye Tkinter")
+l.pack()
+l2.pack()
+button1 = Button(topFrame, text="Button 1", fg="red",bg="black")
+button2 = Button(topFrame, text="Button 2", fg="blue")
+button3 = Button(topFrame, text="Button 3", fg="green")
+button4 = Button(bottomFrame, text="Button 4", fg="purple")
+
+button1.pack(fill=X)
+button2.pack(side=LEFT)
+button3.pack(side=LEFT)
+button4.pack()
+root.mainloop()
