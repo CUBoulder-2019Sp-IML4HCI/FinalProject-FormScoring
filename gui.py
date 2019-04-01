@@ -1,23 +1,62 @@
+import argparse
+from pythonosc import dispatcher
+from pythonosc import osc_server
+import threading
 from tkinter import *
 
 
 
 class GuiLogic:
-    def __init__(self,master):
+    def __init__(self):
+        self.master = Tk()
         exercises = ["Bicep Curl","Bench Press"]
-        self.selected_exercise = StringVar(master)
-        self.selected_exercise.set(exercises[0])
-        exercise_select = OptionMenu(master, self.selected_exercise,*exercises)
-        record_button = Button(master, text="Start/Stop Recording",command=self.record)
+        self.selected_exercise = StringVar(self.master)
+        self.selected_exercise.set(exercises[1])
+        exercise_select = OptionMenu(self.master, self.selected_exercise,*exercises)
+        record_button = Button(self.master, text="Start/Stop Recording",command=self.record)
         exercise_select.pack()
         record_button.pack()
+        self.recording = BooleanVar()
+        self.recording.set(False)
+        self.loop = True
     def record(self):
         #implement logic to record data
-        print("record")
+        print(self.selected_exercise.get())
+        if self.recording.get():
+            print("stopped recording")
+            self.recording.set(False)
+        else:
+            print("started recording")
+            self.recording.set(True)
+    def receiveData(self,one,two,three):
+        #print(one, two, three)
+        if self.recording.get():
+            print(one,two,three)
+    def GUI_mainloop(self):
+        while self.loop:
+            self.master.update_idletasks()
+            self.master.update()
 
-root = Tk()
-GL = GuiLogic(root)
-root.mainloop()
+
+class Server:
+    def __init__(self,GL):
+        self.GL = GL
+    def run_server(self):
+        d = dispatcher.Dispatcher()
+        d.map("/wek/inputs", self.GL.receiveData)
+        port = 6448
+        ip = "127.0.0.1"
+        server = osc_server.ThreadingOSCUDPServer(
+          (ip, port), d)
+        print("Serving on {}".format(server.server_address))
+        server.serve_forever()
+
+GL = GuiLogic()
+S = Server(GL)
+Server_Thread = threading.Thread(target = S.run_server , args=())
+Server_Thread.daemon = True
+Server_Thread.start()
+GL.master.mainloop()
 
 
 '''
