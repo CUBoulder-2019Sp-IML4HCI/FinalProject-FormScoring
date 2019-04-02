@@ -16,13 +16,14 @@ class Sender:
         else:
             self.send = self.send_signal
     def send_signal(self):
-        print(self.output)
+        #print(self.output)
         client.send_message("/final", self.output)
 
 
-# change this string depending upon where your computer makes a device for the micro:bit
+#if windows
 if os.name == 'nt':
-    serialport = "COM4"
+    serialport = "COM5"
+#else linux
 else:
     serialport = "/dev/cu.usbmodem14302"
 
@@ -33,14 +34,21 @@ S = Sender()
 while(True):
     line = ser.readline().decode('utf8').strip()
 
-    message = list(map(float, line.split("^")))
+    message = list(map(str, line.split("^")))
     tag = message[0]
     if tag == "a":
-        S.output[0:3] = message[1:3]
+        print(message)
+        print("before: ",S.output)
+        S.output[:4] = message[1:]
+        print("after: ",S.output)
     elif tag == "b":
-        S.output[4:7] = message[1:3]
+        print(message)
+        print("before: ",S.output)
+        S.output[:4] = message[1:]
+        print("after: ",S.output)
+        S.output[4:] = message[1:]
     S.send()
-    print(S.output)
+    #print(S.output)
 
 
 #import serial
