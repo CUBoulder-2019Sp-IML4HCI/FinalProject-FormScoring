@@ -3,6 +3,7 @@ from pythonosc import dispatcher
 from pythonosc import osc_server
 import threading
 from tkinter import *
+import _pickle as p
 
 
 
@@ -14,42 +15,71 @@ class GuiLogic:
         self.selected_exercise.set(exercises[1])
         exercise_select = OptionMenu(self.master, self.selected_exercise,*exercises)
         record_button = Button(self.master, text="Start/Stop Recording",command=self.record)
+        self.file_name = StringVar(self.master)
+        self.file_name.set("FormScoringData")
+        file_name_entry = Entry(self.master, textvariable=self.file_name)
+        save_button = Button(self.master, text="Save Data",command=self.save)
         exercise_select.pack()
         record_button.pack()
+        file_name_entry.pack()
+        save_button.pack()
         self.recording = BooleanVar()
         self.recording.set(False)
         self.loop = True
+        self.e = threading.Event()
+        self.data = []
+    def save(self):
+        file_name = self.file_name.get() + ".pickle"
+        with open(file_name, 'wb') as data_handle:
+            p.dump(self.data,data_handle)
+        print("Data saved as ", file_name)
     def record(self):
-        #implement logic to record data
-        print(self.selected_exercise.get())
+        #print(self.selected_exercise.get())
         if self.recording.get():
-            print("stopped recording")
-            self.recording.set(False)
+            self.stop_record()
         else:
-            print("started recording")
-            self.recording.set(True)
+            self.start_record()
+
+    def start_record(self):
+        print("started recording")
+        self.recording.set(True)
+        self.single_movement = []
+
+    def stop_record(self):
+        print("stopped recording")
+        self.recording.set(False)
+        self.data.append(self.single_movement)
+
     def receiveData(self,one,two,three):
-        #print(one, two, three)
         if self.recording.get():
-            print(one,two,three)
-    def GUI_mainloop(self):
+            if self.e.is_set():
+                print("data lost")
+            else:
+                self.e.set()
+                self.single_movement.append([one,two,three])
+                self.e.clear()
+                print(one,two,three)
+
+    def gui_mainloop(self):
         while self.loop:
             self.master.update_idletasks()
             self.master.update()
 
 
 class Server:
-    def __init__(self,GL):
+    def __init__(self, GL, ip="127.0.0.1", port=6448):
         self.GL = GL
+        self.ip = ip
+        self.port = port
+
     def run_server(self):
         d = dispatcher.Dispatcher()
         d.map("/wek/inputs", self.GL.receiveData)
-        port = 6448
-        ip = "127.0.0.1"
         server = osc_server.ThreadingOSCUDPServer(
-          (ip, port), d)
+          (self.ip, self.port), d)
         print("Serving on {}".format(server.server_address))
         server.serve_forever()
+
 
 GL = GuiLogic()
 S = Server(GL)
