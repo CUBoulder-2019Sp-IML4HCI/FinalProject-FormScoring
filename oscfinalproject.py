@@ -16,13 +16,13 @@ class Sender:
         else:
             self.send = self.send_signal
     def send_signal(self):
-        #print(self.output)
+        print(self.output)
         client.send_message("/final", self.output)
 
 
 #if windows
 if os.name == 'nt':
-    serialport = "COM5"
+    serialport = "COM7"
 #else linux
 else:
     serialport = "/dev/cu.usbmodem14302"
@@ -37,15 +37,8 @@ while(True):
     message = list(map(str, line.split("^")))
     tag = message[0]
     if tag == "a":
-        print(message)
-        print("before: ",S.output)
         S.output[:4] = message[1:]
-        print("after: ",S.output)
     elif tag == "b":
-        print(message)
-        print("before: ",S.output)
-        S.output[:4] = message[1:]
-        print("after: ",S.output)
         S.output[4:] = message[1:]
     S.send()
     #print(S.output)

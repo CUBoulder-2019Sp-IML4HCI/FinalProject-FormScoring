@@ -50,15 +50,15 @@ class GuiLogic:
         self.recording.set(False)
         self.data.append(self.single_movement)
 
-    def receiveData(self,one,two,three):
+    def receiveData(self,one=None,two=None,three=None,four=None,five=None,six=None,seven=None,eight=None,nine=None,ten=None):
         if self.recording.get():
             if self.e.is_set():
                 print("data lost")
             else:
                 self.e.set()
-                self.single_movement.append([one,two,three])
+                self.single_movement.append([one,two,three,four,five,six,seven,eight,nine,ten])
                 self.e.clear()
-                print(one,two,three)
+                print(self.single_movement)
 
     def gui_mainloop(self):
         while self.loop:
@@ -67,14 +67,14 @@ class GuiLogic:
 
 
 class Server:
-    def __init__(self, GL, ip="127.0.0.1", port=6448):
+    def __init__(self, GL, ip="localhost", port=8999):
         self.GL = GL
         self.ip = ip
         self.port = port
 
     def run_server(self):
         d = dispatcher.Dispatcher()
-        d.map("/wek/inputs", self.GL.receiveData)
+        d.map("/final", self.GL.receiveData)
         server = osc_server.ThreadingOSCUDPServer(
           (self.ip, self.port), d)
         print("Serving on {}".format(server.server_address))
