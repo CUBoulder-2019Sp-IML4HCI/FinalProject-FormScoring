@@ -4,8 +4,9 @@ from pythonosc import osc_server
 import threading
 from tkinter import *
 import _pickle as p
-
-
+import os
+import serial
+from pythonosc import udp_client
 
 class GuiLogic:
     def __init__(self):
@@ -28,6 +29,7 @@ class GuiLogic:
         self.loop = True
         self.e = threading.Event()
         self.data = []
+
     def save(self):
         file_name = self.file_name.get() + ".pickle"
         with open(file_name, 'wb') as data_handle:
@@ -43,42 +45,66 @@ class GuiLogic:
     def start_record(self):
         print("started recording")
         self.recording.set(True)
-        self.single_movement = []
+
 
     def stop_record(self):
         print("stopped recording")
         self.recording.set(False)
-        self.data.append(self.single_movement)
 
-    def receiveData(self,one=None,two=None,three=None,four=None,five=None,six=None,seven=None,eight=None,nine=None,ten=None):
-        if self.recording.get():
-            if self.e.is_set():
-                print("data lost")
-            else:
-                self.e.set()
-                self.single_movement.append([one,two,three,four,five,six,seven,eight,nine,ten])
-                self.e.clear()
-                print(self.single_movement)
-
-    def gui_mainloop(self):
-        while self.loop:
-            self.master.update_idletasks()
-            self.master.update()
 
 
 class Server:
-    def __init__(self, GL, ip="localhost", port=8999):
+    def __init__(self, GL, ip="localhost", port=6448):
         self.GL = GL
         self.ip = ip
         self.port = port
+        self.client = udp_client.SimpleUDPClient(self.ip, self.port)
+
+        self.output = [None] * 8
+        self.send = self.wait_for_fill
+        self.record_prev_state = False
+
+    def wait_for_fill(self):
+        if None in self.output:
+            print("Waiting on full output.")
+            # print(self.output)
+        else:
+            self.send = self.send_signal
+
+    def send_signal(self):
+        print(self.output)
+        self.client.send_message("/wek/inputs", self.output)
 
     def run_server(self):
-        d = dispatcher.Dispatcher()
-        d.map("/final", self.GL.receiveData)
-        server = osc_server.ThreadingOSCUDPServer(
-          (self.ip, self.port), d)
-        print("Serving on {}".format(server.server_address))
-        server.serve_forever()
+        # if windows
+        if os.name == 'nt':
+            serialport = "COM7"
+        # else linux
+        else:
+            serialport = "/dev/cu.usbmodem14302"
+
+        ser = serial.Serial(serialport, 115200)
+        while (True):
+
+
+            line = ser.readline().decode('utf8').strip()
+
+            message = list(map(str, line.split("^")))
+            tag = message[0]
+            #print(message)
+            if tag == "a":
+                self.output[:4] = message[1:]
+            elif tag == "b":
+                self.output[4:] = message[1:]
+            self.send()
+            # print(S.output)
+            new_state = GL.recording.get()
+            if new_state != self.record_prev_state:
+                self.record_prev_state = new_state
+                if new_state:
+                    self.client.send_message("/wekinator/control/startDtwRecording", 1)
+                else:
+                    self.client.send_message("/wekinator/control/stopDtwRecording", 1)
 
 
 GL = GuiLogic()

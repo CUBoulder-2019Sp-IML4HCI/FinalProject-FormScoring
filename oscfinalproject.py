@@ -18,7 +18,7 @@ class Sender:
             self.send = self.send_signal
     def send_signal(self):
         print(self.output)
-        client.send_message("/final", self.output)
+        client.send_message("/wek/inputs", self.output)
 
 
 #if windows
@@ -30,7 +30,7 @@ else:
 
  
 ser = serial.Serial(serialport, 115200)
-client = udp_client.SimpleUDPClient("localhost", 8999)
+client = udp_client.SimpleUDPClient("localhost", 6448)
 S = Sender()
 while(True):
     line = ser.readline().decode('utf8').strip()
