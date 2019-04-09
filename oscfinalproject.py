@@ -13,6 +13,7 @@ class Sender:
     def wait_for_fill(self):
         if None in self.output:
             print("Waiting on full output.")
+            #print(self.output)
         else:
             self.send = self.send_signal
     def send_signal(self):
@@ -36,6 +37,7 @@ while(True):
 
     message = list(map(str, line.split("^")))
     tag = message[0]
+    print(message)
     if tag == "a":
         S.output[:4] = message[1:]
     elif tag == "b":
