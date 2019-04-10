@@ -46,11 +46,47 @@
     2. A tight fitting glove holds the microbit mounting method closer to the skin. In order to reduce                              irritation, fine thread was used to adhere the microbit.
     3. The battery pack is bulky, and position preference seems to change with each user. I need to                                find a way to have a repositional battery pack that is still safely secured. 
     4. The next iteration of the upper arm cuff seemed promising until it was taken to the gym. An                                  unforseen problem was realized: the microbit needs to be able to be detached so the band can be                              cleaned (the band band will absorb sweat during a workout. Current material and design is not                                well suited for easy washing.
-                          
+
+# 03-31-2019 Garrett Sippel:
+- Create initial GUI.
+
+# 04-01-2019 Garrett Sippel:
+- Experiment with threading GUI and server class together.
+
+
+# 04-01-2019 Ian Wilkins:
+- At this point in the project, we have reasonable mounts for the microbits (though more development is needed on the upper arm mount), we have a basic GUI, we have basic data handling, and we have all the components talking to each other. We have confirmed that we can recieve and process the XYZ acceleration values and signal stength between microbits, and that the signal strength is in fact reasonable different at different stages of our test exercises. The next step is to implement the DTW. Today involved reasearch on available DTW libraries and what option is most applicable to our project.
+
 # 04-02-2019 Ian Wilkins: 
 - Create third glove and armband mount for 'a' and 'b' microbits. The following discoveries were made from these prototypes:
     1. Constraining the microbits with the auxillary pins parallel to the knuckles on the ulnar side of                              the glove, and a slightly slackened thread through the power inpit connecting to the space                                    between the tendon of the thumb and the tendon of the forefinger provides adequate constraint,                                handles stretching well, and does not feel awkward during use.
     2. A glove was found with a cuff material that adheres well to the hook side of a hook and loop                                  patch. The battery pack now has a hook patch added so it can bea easily repositioned anywhere on                              the cuff of the glove without adding extra bulk.
     3. The glove is almost done, it now needs a way for the microbit to be detached when the glove is                                whashed.
     4. The next iteration of the upper arm cuff used chicago screws to secure the microbit such that it                              could be detached for cleaning. The cuff needed to have gromets added to prevent fraying in the                              areas that the chicago screws went through. The gromets chose were very irritating during use.                                For the next iteration of the upper arm cuff, I plan on using a physical therapy light-duty                                  compression sleeve, and sewing a stretch compensated pocket for the microbit and battery pack.
+
+# 04-04-2019 Both:
+- After discovering microbit radio latency/message chain issues during in class demos, the source of this latency was pinpointed and corrected.
+- The source of the error was we updated both microbits to an old hex that did not inclide the global variable for last received message time, which were needed to restart the message chain if a deadlock was reached.
+
+# 04-04-2019 Garrett Sippel:
+- Research options for using GUI to send control messages to Wekinator. This may be a simpler option than implementing our own DTW. If the GUI can be used to send control messages, Wekinator can handle the processing, and the GUI can display the outputs.
+
+# 04-06-2019 Ian Wilkins:
+- Create fourth armband mount for 'b' bicrobit. The following discoveries were made from this prototype:
+    1.  A standard upper arm compression sleeve is easily torn by the microbit. Additionally, the microbit is very                    uncomfortable when held in a pocket or folded cuff of the compression sleeve (the current pocket design causes the            microbit to abbrade the upper arm, which wears down the compression sleeve and is uncomfortable for the user).
+    2.  The next design must not press the microbit against the body. The proposed next design will have a more loosely               affixed pocket for the microbit, and some additional padding to prevent abbrasion against the arm.
+    
+# 04-09-2019 Both:
+- Problem 1 (FIXED): Sending control messages to Wekinator stops Wekinator from receiving the microbit data input. The following fixes were made:
+    1.  Update OSC server class to handle the Wekinator control signals and the microbit data input. This involved changing the GUI class such that the server access state variables of the GUI class to indicate when Wekinator control messages should be sent.
+    2. There was an additional space ('\s') in the message address/prefix that was short circuiting Wekinator, and forcing it to stop listening to the input port.
+    
+- Problem 2 (IN PROGRESS): Wekinator is receiving input vectors populated with 0.0. The following debudding steps have been taken:
+    1.  Print Wekinator input immediately before it is sent to Wekinator via OSC server. The printed messages look good.
+    2.  Set input as a variable and then send the variable. Variable prints as expected.
+    3.  Change the initialization and data structure of the input.
+   
+# 04-10-2019 Both:
+FIXED Problem 2 Described in last update.
+New Update Video.
                
