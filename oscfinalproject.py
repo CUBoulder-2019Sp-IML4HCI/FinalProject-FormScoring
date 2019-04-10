@@ -13,39 +13,34 @@ class Sender:
     def wait_for_fill(self):
         if None in self.output:
             print("Waiting on full output.")
+            #print(self.output)
         else:
             self.send = self.send_signal
     def send_signal(self):
-        #print(self.output)
-        client.send_message("/final", self.output)
+        print(self.output)
+        client.send_message("/wek/inputs", self.output)
 
 
 #if windows
 if os.name == 'nt':
-    serialport = "COM5"
+    serialport = "COM7"
 #else linux
 else:
     serialport = "/dev/cu.usbmodem14302"
 
  
 ser = serial.Serial(serialport, 115200)
-client = udp_client.SimpleUDPClient("localhost", 8999)
+client = udp_client.SimpleUDPClient("localhost", 6448)
 S = Sender()
 while(True):
     line = ser.readline().decode('utf8').strip()
 
     message = list(map(str, line.split("^")))
     tag = message[0]
+    print(message)
     if tag == "a":
-        print(message)
-        print("before: ",S.output)
         S.output[:4] = message[1:]
-        print("after: ",S.output)
     elif tag == "b":
-        print(message)
-        print("before: ",S.output)
-        S.output[:4] = message[1:]
-        print("after: ",S.output)
         S.output[4:] = message[1:]
     S.send()
     #print(S.output)

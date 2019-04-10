@@ -3,15 +3,11 @@ from pythonosc import dispatcher
 from pythonosc import osc_server
 import threading
 from tkinter import *
+#import tkinter
 import _pickle as p
-import numpy as np
-from scipy.spatial.distance import euclidean
-from fastdtw import fastdtw
-from math import floor
+import os
 import serial
 from pythonosc import udp_client
-
-
 
 class GuiLogic:
     def __init__(self):
@@ -34,13 +30,12 @@ class GuiLogic:
         self.loop = True
         self.e = threading.Event()
         self.data = []
-        
+
     def save(self):
         file_name = self.file_name.get() + ".pickle"
         with open(file_name, 'wb') as data_handle:
             p.dump(self.data,data_handle)
         print("Data saved as ", file_name)
-        
     def record(self):
         #print(self.selected_exercise.get())
         if self.recording.get():
@@ -51,86 +46,75 @@ class GuiLogic:
     def start_record(self):
         print("started recording")
         self.recording.set(True)
-        self.single_movement = []
+
 
     def stop_record(self):
         print("stopped recording")
         self.recording.set(False)
-        self.data.append(self.single_movement)
-
-    def receiveData(self,one,two,three):
-        if self.recording.get():
-            if self.e.is_set():
-                print("data lost")
-            else:
-                self.e.set()
-                self.single_movement.append([one,two,three])
-                self.e.clear()
-                print(one,two,three)
-
-    def gui_mainloop(self):
-        while self.loop:
-            self.master.update_idletasks()
-            self.master.update()
 
 
+def str_float_map(x):
+    try:
+        y = float(x)
+    except:
+        y = str(x)
+        
+    return(y)
+    
 class Server:
-    def __init__(self, GL, ip="127.0.0.1", port=6448):
+    def __init__(self, GL, ip="localhost", port=6448):
         self.GL = GL
         self.ip = ip
         self.port = port
+        self.client = udp_client.SimpleUDPClient(self.ip, self.port)
+
+        self.output = [None] * 8
+        self.send = self.wait_for_fill
+        self.record_prev_state = False
+
+    def wait_for_fill(self):
+        if None in self.output:
+            print("Waiting on full output.")
+            # print(self.output)
+        else:
+            self.send = self.send_signal
+
+    def send_signal(self):
+        print(self.output)
+        self.client.send_message("/wek/inputs", self.output)
 
     def run_server(self):
-        serialport = "/dev/ttyACM0"
- 
+        # if windows
+        if os.name == 'nt':
+            serialport = "COM7"
+        # else linux
+        else:
+            #serialport = "/dev/cu.usbmodem14302"
+            serialport = "/dev/ttyACM0"
+
         ser = serial.Serial(serialport, 115200)
-        client = udp_client.SimpleUDPClient("localhost", 8999)
-         
-        while(True):
+        while (True):
             line = ser.readline().decode('utf8').strip()
-            print(line)
+            #message = list(map(str, line.split("^")))
+            message = list(map(str_float_map, line.split("^")))
             
-            if line.count('^') != 4: continue
-         
-            n, s, x, y, z = line.split("^")
-         
-            print(f"({n}, {s}, {x}, {y}, {z})")
-         
-            client.send_message("/form_data", [n, s, x, y, z] )
-    
-        #d = dispatcher.Dispatcher()
-        #d.map("/wek/inputs", self.GL.receiveData)
-        #server = osc_server.ThreadingOSCUDPServer(
-        #  (self.ip, self.port), d)
-        #print("Serving on {}".format(server.server_address))
-        #server.serve_forever()
+            tag = message[0]
+            #print(message)
+            if tag == "a":
+                self.output[:4] = message[1:]
+            elif tag == "b":
+                self.output[4:] = message[1:]
+            self.send()
+            # print(S.output)
+            new_state = GL.recording.get()
+            if new_state != self.record_prev_state:
+                self.record_prev_state = new_state
+                if new_state:
+                    self.client.send_message("/wekinator/control/startDtwRecording", 1)
+                else:
+                    self.client.send_message("/wekinator/control/stopDtwRecording", 1)
 
 
-class DataProcessing:
-    def __init__(self, exercise_names):
-        self.warped_training_data = {}
-        
-    def train_exercise_dtw(self, exercise_name, exercise_data):
-        # Extract median length training series.
-        median_len_series = sorted(exercise_data, key=len)[floor(len(exercise_data)/2)]
-        
-        # Perform DTW on each training series using the median_len_series as
-        # y and each series in  exercise_data as x.
-        for exercise_sample in exercise_data:
-            distance, path = fastdtw(exercise_sample, median_len_series, dist=euclidean)
-            try:
-                self.warped_training_data[exercise_name].append(path)
-            except:
-                self.warped_training_data[exercise_name].append([path])
-            
-        
-    def test_exercise_dtw(self, rep_array, exercise_name):
-        distances = []
-        for model_rep_array in self.warped_training_data[exercise_name]:
-            distance, path = fastdtw(rep_array, model_rep_array, dist=euclidean)
-            distances.append((distance, path))
-        return(min(distances, key=lambda tup: tup[0])[1])
-        
 GL = GuiLogic()
 S = Server(GL)
 Server_Thread = threading.Thread(target = S.run_server , args=())
@@ -153,22 +137,13 @@ class ButtonHandler:
         subMenu.add_command(label="Exit",command=frame.quit)
         menu.add_cascade(label="Edit", menu=editMenu)
         editMenu.add_command(label="hello",command = self.printMessage)
-
-
         frame.pack()
-
         self.printButton = Button(frame, text="Print Message", command = self.printMessage)
         self.printButton.pack(side=LEFT)
-
         self.quitButton = Button(frame, text="Quit", command=frame.quit)
         self.quitButton.pack(side=LEFT)
     def printMessage(self):
         print("hello")
-
-
-
-
-
 root = Tk()
 BH = ButtonHandler(root)
 root.mainloop()
@@ -177,16 +152,13 @@ root.mainloop()
 '''
 def leftClick(event):
     print("Left")
-
 def rightClick(event):
     print("Right")
-
 root= Tk()
 frame = Frame(root, width=300,height=250)
 frame.bind("<Button-1>",leftClick)
 frame.bind("<Button-3>", rightClick)
 frame.pack()
-
 root.mainloop()
 '''
 '''
@@ -216,14 +188,11 @@ label_1 = Label(root,text="Name")
 label_2 = Label(root,text="Password")
 entry_1 = Entry(root)
 entry_2 = Entry(root)
-
 label_1.grid(row=0, sticky=E)
 label_2.grid(row=1,sticky=E)
 entry_1.grid(row=0,column=1)
 entry_2.grid(row=1,column=1)
-
 c = Checkbutton(root, text="Keep me logged in")
 c.grid(columnspan = 2)
-
 root.mainloop()
 '''
