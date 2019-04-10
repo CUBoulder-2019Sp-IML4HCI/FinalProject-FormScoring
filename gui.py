@@ -4,6 +4,12 @@ from pythonosc import osc_server
 import threading
 from tkinter import *
 import _pickle as p
+import numpy as np
+from scipy.spatial.distance import euclidean
+from fastdtw import fastdtw
+from math import floor
+import serial
+from pythonosc import udp_client
 
 
 
@@ -28,11 +34,13 @@ class GuiLogic:
         self.loop = True
         self.e = threading.Event()
         self.data = []
+        
     def save(self):
         file_name = self.file_name.get() + ".pickle"
         with open(file_name, 'wb') as data_handle:
             p.dump(self.data,data_handle)
         print("Data saved as ", file_name)
+        
     def record(self):
         #print(self.selected_exercise.get())
         if self.recording.get():
@@ -73,14 +81,56 @@ class Server:
         self.port = port
 
     def run_server(self):
-        d = dispatcher.Dispatcher()
-        d.map("/wek/inputs", self.GL.receiveData)
-        server = osc_server.ThreadingOSCUDPServer(
-          (self.ip, self.port), d)
-        print("Serving on {}".format(server.server_address))
-        server.serve_forever()
+        serialport = "/dev/ttyACM0"
+ 
+        ser = serial.Serial(serialport, 115200)
+        client = udp_client.SimpleUDPClient("localhost", 8999)
+         
+        while(True):
+            line = ser.readline().decode('utf8').strip()
+            print(line)
+            
+            if line.count('^') != 4: continue
+         
+            n, s, x, y, z = line.split("^")
+         
+            print(f"({n}, {s}, {x}, {y}, {z})")
+         
+            client.send_message("/form_data", [n, s, x, y, z] )
+    
+        #d = dispatcher.Dispatcher()
+        #d.map("/wek/inputs", self.GL.receiveData)
+        #server = osc_server.ThreadingOSCUDPServer(
+        #  (self.ip, self.port), d)
+        #print("Serving on {}".format(server.server_address))
+        #server.serve_forever()
 
 
+class DataProcessing:
+    def __init__(self, exercise_names):
+        self.warped_training_data = {}
+        
+    def train_exercise_dtw(self, exercise_name, exercise_data):
+        # Extract median length training series.
+        median_len_series = sorted(exercise_data, key=len)[floor(len(exercise_data)/2)]
+        
+        # Perform DTW on each training series using the median_len_series as
+        # y and each series in  exercise_data as x.
+        for exercise_sample in exercise_data:
+            distance, path = fastdtw(exercise_sample, median_len_series, dist=euclidean)
+            try:
+                self.warped_training_data[exercise_name].append(path)
+            except:
+                self.warped_training_data[exercise_name].append([path])
+            
+        
+    def test_exercise_dtw(self, rep_array, exercise_name):
+        distances = []
+        for model_rep_array in self.warped_training_data[exercise_name]:
+            distance, path = fastdtw(rep_array, model_rep_array, dist=euclidean)
+            distances.append((distance, path))
+        return(min(distances, key=lambda tup: tup[0])[1])
+        
 GL = GuiLogic()
 S = Server(GL)
 Server_Thread = threading.Thread(target = S.run_server , args=())
