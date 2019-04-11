@@ -12,32 +12,21 @@ from pythonosc import udp_client
 class GuiLogic:
     def __init__(self):
         self.master = Tk()
-        exercises = ["Bicep Curl","Bench Press"]
+        self.exercises = ["Still","Bicep Curl-Good","Bicep Curl-Bad","Bench Press-Good","Bench Press-Bad"]
+        self.exercise_values = {e:i+1 for i,e in enumerate(self.exercises)}
         self.selected_exercise = StringVar(self.master)
-        self.selected_exercise.set(exercises[1])
-        exercise_select = OptionMenu(self.master, self.selected_exercise,*exercises)
+        self.selected_exercise.set(self.exercises[0])
+        exercise_select = OptionMenu(self.master, self.selected_exercise,*self.exercises)
         record_button = Button(self.master, text="Start/Stop Recording",command=self.record)
-        self.file_name = StringVar(self.master)
-        self.file_name.set("FormScoringData")
-        file_name_entry = Entry(self.master, textvariable=self.file_name)
-        save_button = Button(self.master, text="Save Data",command=self.save)
         exercise_select.pack()
         record_button.pack()
-        file_name_entry.pack()
-        save_button.pack()
         self.recording = BooleanVar()
         self.recording.set(False)
         self.loop = True
         self.e = threading.Event()
         self.data = []
 
-    def save(self):
-        file_name = self.file_name.get() + ".pickle"
-        with open(file_name, 'wb') as data_handle:
-            p.dump(self.data,data_handle)
-        print("Data saved as ", file_name)
     def record(self):
-        #print(self.selected_exercise.get())
         if self.recording.get():
             self.stop_record()
         else:
@@ -47,10 +36,16 @@ class GuiLogic:
         print("started recording")
         self.recording.set(True)
 
-
     def stop_record(self):
         print("stopped recording")
         self.recording.set(False)
+
+    def getExerciseValue(self):
+        v = self.exercise_values[self.selected_exercise.get()]
+        print(v)
+        return v
+
+
 
 
 def str_float_map(x):
@@ -110,7 +105,7 @@ class Server:
             if new_state != self.record_prev_state:
                 self.record_prev_state = new_state
                 if new_state:
-                    self.client.send_message("/wekinator/control/startDtwRecording", 1)
+                    self.client.send_message("/wekinator/control/startDtwRecording", GL.getExerciseValue())
                 else:
                     self.client.send_message("/wekinator/control/stopDtwRecording", 1)
 
