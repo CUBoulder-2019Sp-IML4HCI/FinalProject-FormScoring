@@ -87,6 +87,6 @@
     3.  Change the initialization and data structure of the input.
    
 # 04-10-2019 Both:
-- FIXED Problem 2 Described in last update.
+- FIXED Problem 2 Described in last update. Input was being mapped to an incorrect data type, a new function to be applied during the serial read map was written.
 - New Update Video. https://youtu.be/Cuhxcn72vcI
                
