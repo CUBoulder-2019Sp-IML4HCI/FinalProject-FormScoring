@@ -81,7 +81,7 @@
     1.  Update OSC server class to handle the Wekinator control signals and the microbit data input. This involved changing the GUI class such that the server access state variables of the GUI class to indicate when Wekinator control messages should be sent.
     2. There was an additional space ('\s') in the message address/prefix that was short circuiting Wekinator, and forcing it to stop listening to the input port.
     
-- Problem 2 (IN PROGRESS): Wekinator is receiving input vectors populated with 0.0. The following debudding steps have been taken:
+- Problem 2: Wekinator is receiving input vectors populated with 0.0. The following debudding steps have been taken:
     1.  Print Wekinator input immediately before it is sent to Wekinator via OSC server. The printed messages look good.
     2.  Set input as a variable and then send the variable. Variable prints as expected.
     3.  Change the initialization and data structure of the input.
@@ -89,4 +89,18 @@
 # 04-10-2019 Both:
 - FIXED Problem 2 Described in last update. Input was being mapped to an incorrect data type, a new function to be applied during the serial read map was written.
 - New Update Video. https://youtu.be/Cuhxcn72vcI
+
+# 04-11-2019 Both:
+- Experiment with changes in signal strength. Reducing signal strength did not change performance very much when microbits have a clear line of sight between eachother, but did improve the detection of bodies blocking the line of sight between microbits. Not all exercises position the body such that the signal between the microbits is obscured, but the ones that do may see a benefit from the reduced signal strength. 
+- New Microbit hex files with reduced signal strength.
+
+# 04-12-2019 Both:
+- EPIPHANY: Providing the user with a 0-100 score is not useful for users looking to understand and improve their form. The regressor score indicates how good or bad the user's form was, without any additional information as to what they did wrong. A regressor score is not particularly meaningful to real-world health and fitness endeavors. A meaningful output should inform the user of the modes of failure in their form such that the user can make corrections. As such, our model will now classify/identify failures in form, and report to the user what aspects need improvement.
+
+# 04-13-2019 Both:
+- Continued field testing has revealed the following issues and potential solutions:
+    1. Every full rep is classified as a half rep before the rep is completed. A half rep can be identified by the following gesture patterns:
+        - half rep, half rep ... (if the true half rep is not the last rep of a set, then the true half rep will be followed by a half)
+        - half rep, end set (if the true half rep is the last rep of the set, then the true half rep will be followed by the end of the set)
+    2. Some failures may not be detectable immediately after the completion of the rep, and instead require an indication that the a new rep is being started. Ex: Excessive retraction/extension at the rest position will only be detected after the proper motion of the rep has been completed.  
                
