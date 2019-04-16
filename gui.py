@@ -12,19 +12,28 @@ from pythonosc import udp_client
 class GuiLogic:
     def __init__(self):
         self.master = Tk()
-        self.exercises = ["Still","Bicep Curl-Good","Bicep Curl-Bad","Bench Press-Good","Bench Press-Bad"]
+        self.exercises = ["Still","Bicep Curl-Good","Bicep Curl-Bad(pronation)","Bicep Curl-Bad(range)"]
         self.exercise_values = {e:i+1 for i,e in enumerate(self.exercises)}
         self.selected_exercise = StringVar(self.master)
         self.selected_exercise.set(self.exercises[0])
         exercise_select = OptionMenu(self.master, self.selected_exercise,*self.exercises)
         record_button = Button(self.master, text="Start/Stop Recording",command=self.record)
+        run_button = Button(self.master, text="Start/Stop Running",command = self.run)
         exercise_select.pack()
         record_button.pack()
+        run_button.pack()
+        self.isRunning = BooleanVar()
+        self.isRunning.set(False)
         self.recording = BooleanVar()
         self.recording.set(False)
         self.loop = True
         self.e = threading.Event()
         self.data = []
+    def run(self):
+        if self.isRunning.get():
+            self.isRunning.set(False)
+        else:
+            self.isRunning.set(True)
 
     def record(self):
         if self.recording.get():
@@ -66,6 +75,7 @@ class Server:
         self.output = [None] * 8
         self.send = self.wait_for_fill
         self.record_prev_state = False
+        self.run_prev_state = False
 
     def wait_for_fill(self):
         if None in self.output:
@@ -75,8 +85,15 @@ class Server:
             self.send = self.send_signal
 
     def send_signal(self):
-        print(self.output)
-        self.client.send_message("/wek/inputs", self.output)
+        s1 = self.output[0]
+        s2 = self.output[4]
+        if s1 == 0 or s2 == 0:
+            strength = max(s1,s2)
+        else:
+            strength = (s1+s2)/2
+        o = [strength] + self.output[1:4] + self.output[5:]
+        print(o)
+        self.client.send_message("/wek/inputs", o)
 
     def run_server(self):
         # if windows
@@ -100,11 +117,18 @@ class Server:
             elif tag == "b":
                 self.output[4:] = message[1:]
             self.send()
-            # print(S.output)
-            new_state = GL.recording.get()
-            if new_state != self.record_prev_state:
-                self.record_prev_state = new_state
-                if new_state:
+            new_rec_state = GL.recording.get()
+            new_run_state = GL.isRunning.get()
+            if new_run_state != self.run_prev_state:
+                self.run_prev_state = new_run_state
+                if new_run_state:
+                    self.client.send_message("/wekinator/control/startRunning", 1)
+                else:
+                    self.client.send_message("/wekinator/control/stopRunning", 1)
+
+            if new_rec_state != self.record_prev_state:
+                self.record_prev_state = new_rec_state
+                if new_rec_state:
                     self.client.send_message("/wekinator/control/startDtwRecording", GL.getExerciseValue())
                 else:
                     self.client.send_message("/wekinator/control/stopDtwRecording", 1)
