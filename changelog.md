@@ -103,4 +103,7 @@
         - half rep, half rep ... (if the true half rep is not the last rep of a set, then the true half rep will be followed by a half)
         - half rep, end set (if the true half rep is the last rep of the set, then the true half rep will be followed by the end of the set)
     2. Some failures may not be detectable immediately after the completion of the rep, and instead require an indication that the a new rep is being started. Ex: Excessive retraction/extension at the rest position will only be detected after the proper motion of the rep has been completed.  
+    
+# 04-17-2019 Both:
+- New Update Video. https://youtu.be/99L_uTlZNxg
                
