@@ -107,3 +107,8 @@
 # 04-17-2019 Both:
 - New Update Video. https://youtu.be/99L_uTlZNxg
                
+# 04-17-2019 Both:
+- In class demos. Key areas to focus include:
+    1. Add GIF/Animation of training motions. The GUI should play an animation of the motion the user is about to train. Additional imporvements may include a countdown to the start of the training recording, and a countdown to the end of the recording. A steamlined training sequence would display an animation of whatever motion was selected from the training dropdown, and once the record button is clicked, a countdown to begin recording is intiaiated, and a countdown to stop recording begins after recording begins.
+    2. Finalize extending the UI to have a form failure display.
+    3. Finalize a working upper arm mount.
