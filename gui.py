@@ -9,10 +9,17 @@ import os
 import serial
 from pythonosc import udp_client
 
+import time
+import os
+
+
+
+
 class GuiLogic:
     def __init__(self):
         self.master = Tk()
         self.exercises = ["Still","Bicep Curl-Good","Bicep Curl-Bad(pronation)","Bicep Curl-Bad(range)"]
+        self.exercise_gifs = ["placeholder","puppies.gif","dogs.gif","puppies.gif","dogs.gif"]
         self.exercise_values = {e:i+1 for i,e in enumerate(self.exercises)}
         self.selected_exercise = StringVar(self.master)
         self.selected_exercise.set(self.exercises[0])
@@ -22,13 +29,21 @@ class GuiLogic:
         exercise_select.pack()
         record_button.pack()
         run_button.pack()
-        self.isRunning = BooleanVar()
+        self.isRunning = BooleanVar(self.master)
         self.isRunning.set(False)
-        self.recording = BooleanVar()
+        self.recording = BooleanVar(self.master)
         self.recording.set(False)
         self.loop = True
         self.e = threading.Event()
         self.data = []
+        self.frames = self.load_gif()
+        self.label = Label(self.master)
+        self.label.pack()
+
+    def load_gif(self):
+        file_name = self.exercise_gifs[self.getExerciseValue()]
+        return [PhotoImage(master=self.master, file=file_name, format='gif -index %i' % i) for i in range(10)]
+
     def run(self):
         if self.isRunning.get():
             self.isRunning.set(False)
@@ -51,10 +66,17 @@ class GuiLogic:
 
     def getExerciseValue(self):
         v = self.exercise_values[self.selected_exercise.get()]
-        print(v)
         return v
 
-
+    def update_gif(self, ind, prev_image):
+        if prev_image != self.getExerciseValue():
+            prev_image = self.getExerciseValue()
+            self.frames = self.load_gif()
+            ind = 0
+        frame = self.frames[ind]
+        ind = (ind + 1)%10
+        self.label.configure(image=frame)
+        self.master.after(100, self.update_gif, ind, prev_image)
 
 
 def str_float_map(x):
@@ -71,7 +93,6 @@ class Server:
         self.ip = ip
         self.port = port
         self.client = udp_client.SimpleUDPClient(self.ip, self.port)
-
         self.output = [None] * 8
         self.send = self.wait_for_fill
         self.record_prev_state = False
@@ -80,7 +101,6 @@ class Server:
     def wait_for_fill(self):
         if None in self.output:
             print("Waiting on full output.")
-            # print(self.output)
         else:
             self.send = self.send_signal
 
@@ -119,6 +139,7 @@ class Server:
             self.send()
             new_rec_state = GL.recording.get()
             new_run_state = GL.isRunning.get()
+
             if new_run_state != self.run_prev_state:
                 self.run_prev_state = new_run_state
                 if new_run_state:
@@ -139,79 +160,6 @@ S = Server(GL)
 Server_Thread = threading.Thread(target = S.run_server , args=())
 Server_Thread.daemon = True
 Server_Thread.start()
+GL.master.after(0, GL.update_gif, 0, GL.getExerciseValue())
 GL.master.mainloop()
 
-
-'''
-class ButtonHandler:
-    def __init__(self,master):
-        frame = Frame(master)
-        menu = Menu(master)
-        master.config(menu=menu)
-        subMenu = Menu(menu)
-        editMenu = Menu(menu)
-        menu.add_cascade(label = "File", menu=subMenu)
-        subMenu.add_command(label = "New Project", command = self.printMessage)
-        subMenu.add_separator()
-        subMenu.add_command(label="Exit",command=frame.quit)
-        menu.add_cascade(label="Edit", menu=editMenu)
-        editMenu.add_command(label="hello",command = self.printMessage)
-        frame.pack()
-        self.printButton = Button(frame, text="Print Message", command = self.printMessage)
-        self.printButton.pack(side=LEFT)
-        self.quitButton = Button(frame, text="Quit", command=frame.quit)
-        self.quitButton.pack(side=LEFT)
-    def printMessage(self):
-        print("hello")
-root = Tk()
-BH = ButtonHandler(root)
-root.mainloop()
-'''
-
-'''
-def leftClick(event):
-    print("Left")
-def rightClick(event):
-    print("Right")
-root= Tk()
-frame = Frame(root, width=300,height=250)
-frame.bind("<Button-1>",leftClick)
-frame.bind("<Button-3>", rightClick)
-frame.pack()
-root.mainloop()
-'''
-'''
-root = Tk()
-topFrame = Frame(root)
-topFrame.pack(fill=X)
-bottomFrame = Frame(root)
-bottomFrame.pack(side=BOTTOM)
-l = Label(topFrame,text="Hello Tkinter")
-l2 = Label(bottomFrame,text="Bye Tkinter")
-l.pack()
-l2.pack()
-button1 = Button(topFrame, text="Button 1", fg="red",bg="black")
-button2 = Button(topFrame, text="Button 2", fg="blue")
-button3 = Button(topFrame, text="Button 3", fg="green")
-button4 = Button(bottomFrame, text="Button 4", fg="purple")
-e1 = Entry(root)
-button1.pack(fill=X)
-button2.pack(side=LEFT)
-button3.pack(side=LEFT)
-button4.pack()
-root.mainloop()
-'''
-'''
-root = Tk()
-label_1 = Label(root,text="Name")
-label_2 = Label(root,text="Password")
-entry_1 = Entry(root)
-entry_2 = Entry(root)
-label_1.grid(row=0, sticky=E)
-label_2.grid(row=1,sticky=E)
-entry_1.grid(row=0,column=1)
-entry_2.grid(row=1,column=1)
-c = Checkbutton(root, text="Keep me logged in")
-c.grid(columnspan = 2)
-root.mainloop()
-'''
