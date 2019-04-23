@@ -3,13 +3,10 @@ from pythonosc import dispatcher
 from pythonosc import osc_server
 import threading
 from tkinter import *
-#import tkinter
 import _pickle as p
 import os
 import serial
 from pythonosc import udp_client
-
-import time
 import os
 
 
@@ -77,6 +74,11 @@ class GuiLogic:
         ind = (ind + 1)%10
         self.label.configure(image=frame)
         self.master.after(100, self.update_gif, ind, prev_image)
+
+    def receive_data(self,data):
+        print("received this data: ", data)
+
+
 
 
 def str_float_map(x):
@@ -155,11 +157,29 @@ class Server:
                     self.client.send_message("/wekinator/control/stopDtwRecording", 1)
 
 
+class Listener:
+    def __init__(self,GL):
+        self.GL = GL
+    def run_listener(self):
+        d = dispatcher.Dispatcher()
+        d.map("/wek/outputs", self.GL.receiveData)
+        port = 6448
+        ip = "127.0.0.1"
+        server = osc_server.ThreadingOSCUDPServer(
+          (ip, port), d)
+        print("Serving on {}".format(server.server_address))
+        server.serve_forever()
+
+
 GL = GuiLogic()
 S = Server(GL)
-Server_Thread = threading.Thread(target = S.run_server , args=())
-Server_Thread.daemon = True
-Server_Thread.start()
+L = Listener(GL)
+Server_Thread_L = threading.Thread(target = L.run_listener , args=())
+Server_Thread_L.daemon = True
+Server_Thread_L.start()
+Server_Thread_S = threading.Thread(target = S.run_server , args=())
+Server_Thread_S.daemon = True
+Server_Thread_S.start()
 GL.master.after(0, GL.update_gif, 0, GL.getExerciseValue())
 GL.master.mainloop()
 
