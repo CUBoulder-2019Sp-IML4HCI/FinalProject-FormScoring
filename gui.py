@@ -15,8 +15,8 @@ import os
 class GuiLogic:
     def __init__(self):
         self.master = Tk()
-        self.exercises = ["Still","Bicep Curl-Good","Bicep Curl-Bad(pronation)","Bicep Curl-Bad(range)"]
-        self.exercise_gifs = ["placeholder","puppies.gif","dogs.gif","puppies.gif","dogs.gif"]
+        self.exercises = ["Still","Bicep Curl-Good","Bicep Curl-Bad(pronation)","Bicep Curl-Bad(half)"]
+        self.exercise_gifs = ["placeholder","BicepCurl_GoodForm.gif","BicepCurl_PronationFailure.gif","puppies.gif","dogs.gif"]
         self.exercise_values = {e:i+1 for i,e in enumerate(self.exercises)}
         self.selected_exercise = StringVar(self.master)
         self.selected_exercise.set(self.exercises[0])
@@ -36,6 +36,12 @@ class GuiLogic:
         self.frames = self.load_gif()
         self.label = Label(self.master)
         self.label.pack()
+        self.rep_text = Label(self.master, text = "Number of Reps" )
+        self.rep_text.pack()
+        self.reps_entry = Entry(self.master)
+        self.reps_entry.insert(END, '5')
+        self.reps_entry.pack()
+        self.history = []
 
     def load_gif(self):
         file_name = self.exercise_gifs[self.getExerciseValue()]
@@ -44,6 +50,7 @@ class GuiLogic:
     def run(self):
         if self.isRunning.get():
             self.isRunning.set(False)
+            self.analyze_set()
         else:
             self.isRunning.set(True)
 
@@ -75,8 +82,39 @@ class GuiLogic:
         self.label.configure(image=frame)
         self.master.after(100, self.update_gif, ind, prev_image)
 
-    def receive_data(self,data):
-        print("received this data: ", data)
+    def receive_data(self,head,one,two,three,four):
+        print("received this data: ", head,one,two,three,four)
+
+    def receive_class(self,head):
+        if head == "/output_1":
+            self.history.append(1)
+        elif head == "/output_2":
+            self.history.append(2)
+        elif head == "/output_3":
+            self.history.append(3)
+        else:
+            self.history.append(4)
+        print(self.history)
+
+    def analyze_set(self):
+        reps = int(self.reps_entry.get())
+        good_reps_counted = 0
+        half_reps_counted = 0
+        pronation_reps_counted = 0
+        for input in self.history:
+            if input == 2:
+                good_reps_counted += 1
+            elif input == 3:
+                pronation_reps_counted += 1
+            elif input == 4:
+                half_reps_counted += 1
+        #half_reps_counted = half_reps_counted-good_reps_counted
+        print("good_reps", good_reps_counted)
+        print("half_reps", half_reps_counted)
+        print("pronation_reps", pronation_reps_counted)
+        self.history = []
+
+
 
 
 
@@ -88,7 +126,8 @@ def str_float_map(x):
         y = str(x)
         
     return(y)
-    
+
+
 class Server:
     def __init__(self, GL, ip="localhost", port=6448):
         self.GL = GL
@@ -114,7 +153,7 @@ class Server:
         else:
             strength = (s1+s2)/2
         o = [strength] + self.output[1:4] + self.output[5:]
-        print(o)
+        #print(o)
         self.client.send_message("/wek/inputs", o)
 
     def run_server(self):
@@ -162,11 +201,14 @@ class Listener:
         self.GL = GL
     def run_listener(self):
         d = dispatcher.Dispatcher()
-        d.map("/wek/outputs", self.GL.receiveData)
-        port = 6448
+        #d.map("/wek/outputs", self.GL.receive_data)
+        d.map("/output_1", self.GL.receive_class)
+        d.map("/output_2", self.GL.receive_class)
+        d.map("/output_3", self.GL.receive_class)
+        d.map("/output_4", self.GL.receive_class)
+        port = 12000
         ip = "127.0.0.1"
-        server = osc_server.ThreadingOSCUDPServer(
-          (ip, port), d)
+        server = osc_server.ThreadingOSCUDPServer((ip, port), d)
         print("Serving on {}".format(server.server_address))
         server.serve_forever()
 
@@ -182,4 +224,3 @@ Server_Thread_S.daemon = True
 Server_Thread_S.start()
 GL.master.after(0, GL.update_gif, 0, GL.getExerciseValue())
 GL.master.mainloop()
-
