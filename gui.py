@@ -18,7 +18,7 @@ class GuiLogic:
         self.exercises = ["Still","Bicep Curl-Good","Bicep Curl-Bad(pronation)","Bicep Curl-Bad(half)"]
         self.exercise_gifs = ["placeholder","still.gif","BicepCurl_GoodForm_1Arm.gif","BicepCurl_PronationFailure_crop.gif","BicepCurl_HalfRep_1Arm.gif"]
         self.exercise_gifs_length = [0,1,41,3,17]
-        self.exercise_speed = [0,100,100,200,100]
+        self.exercise_speed = [0,100,100,300,100]
         self.exercise_values = {e:i+1 for i,e in enumerate(self.exercises)}
         self.selected_exercise = StringVar(self.master)
         self.selected_exercise.set(self.exercises[0])
