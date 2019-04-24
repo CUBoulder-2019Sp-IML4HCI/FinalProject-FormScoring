@@ -16,8 +16,8 @@ class GuiLogic:
     def __init__(self):
         self.master = Tk()
         self.exercises = ["Still","Bicep Curl-Good","Bicep Curl-Bad(pronation)","Bicep Curl-Bad(half)"]
-        self.exercise_gifs = ["placeholder","puppies.gif","BicepCurl_GoodForm.gif","BicepCurl_PronationFailure.gif","puppies.gif","dogs.gif"]
-        self.exercise_gifs_length = [0,31,18,3,10]
+        self.exercise_gifs = ["placeholder","BicepCurl_HalfRep.gif","BicepCurl_GoodForm.gif","BicepCurl_PronationFailure.gif","puppies.gif","dogs.gif"]
+        self.exercise_gifs_length = [0,45,18,3,10]
         self.exercise_speed = [0,100,100,200,100]
         self.exercise_values = {e:i+1 for i,e in enumerate(self.exercises)}
         self.selected_exercise = StringVar(self.master)
