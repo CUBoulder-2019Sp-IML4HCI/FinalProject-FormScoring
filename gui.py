@@ -16,7 +16,9 @@ class GuiLogic:
     def __init__(self):
         self.master = Tk()
         self.exercises = ["Still","Bicep Curl-Good","Bicep Curl-Bad(pronation)","Bicep Curl-Bad(half)"]
-        self.exercise_gifs = ["placeholder","BicepCurl_GoodForm.gif","BicepCurl_PronationFailure.gif","puppies.gif","dogs.gif"]
+        self.exercise_gifs = ["placeholder","puppies.gif","BicepCurl_GoodForm.gif","BicepCurl_PronationFailure.gif","puppies.gif","dogs.gif"]
+        self.exercise_gifs_length = [0,31,18,3,10]
+        self.exercise_speed = [0,100,100,200,100]
         self.exercise_values = {e:i+1 for i,e in enumerate(self.exercises)}
         self.selected_exercise = StringVar(self.master)
         self.selected_exercise.set(self.exercises[0])
@@ -45,7 +47,7 @@ class GuiLogic:
 
     def load_gif(self):
         file_name = self.exercise_gifs[self.getExerciseValue()]
-        return [PhotoImage(master=self.master, file=file_name, format='gif -index %i' % i) for i in range(10)]
+        return [PhotoImage(master=self.master, file=file_name, format='gif -index %i' % i) for i in range(self.exercise_gifs_length[self.getExerciseValue()])]
 
     def run(self):
         if self.isRunning.get():
@@ -78,9 +80,9 @@ class GuiLogic:
             self.frames = self.load_gif()
             ind = 0
         frame = self.frames[ind]
-        ind = (ind + 1)%10
+        ind = (ind + 1)%self.exercise_gifs_length[prev_image]
         self.label.configure(image=frame)
-        self.master.after(100, self.update_gif, ind, prev_image)
+        self.master.after(self.exercise_speed[prev_image], self.update_gif, ind, prev_image)
 
     def receive_data(self,head,one,two,three,four):
         print("received this data: ", head,one,two,three,four)
