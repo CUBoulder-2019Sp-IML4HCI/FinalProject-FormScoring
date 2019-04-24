@@ -16,8 +16,8 @@ class GuiLogic:
     def __init__(self):
         self.master = Tk()
         self.exercises = ["Still","Bicep Curl-Good","Bicep Curl-Bad(pronation)","Bicep Curl-Bad(half)"]
-        self.exercise_gifs = ["placeholder","puppies.gif","BicepCurl_GoodForm_1Arm.gif","BicepCurl_PronationFailure.gif"]
-        self.exercise_gifs_length = [0,31,41,3,45]
+        self.exercise_gifs = ["placeholder","puppies.gif","BicepCurl_GoodForm_1Arm.gif","BicepCurl_PronationFailure.gif","BicepCurl_HalfRep_1Arm.gif"]
+        self.exercise_gifs_length = [0,31,41,3,17]
         self.exercise_speed = [0,100,100,200,100]
         self.exercise_values = {e:i+1 for i,e in enumerate(self.exercises)}
         self.selected_exercise = StringVar(self.master)
@@ -35,7 +35,8 @@ class GuiLogic:
         self.loop = True
         self.e = threading.Event()
         self.data = []
-        self.frames = self.load_gif()
+        self.gifs_dict = {i+1:self.load_gif_by_value(i+1) for i,e in enumerate(self.exercises)}
+        self.frames = self.gifs_dict[self.getExerciseValue()]
         self.label = Label(self.master)
         self.label.pack()
         self.rep_text = Label(self.master, text = "Number of Reps" )
@@ -45,9 +46,9 @@ class GuiLogic:
         self.reps_entry.pack()
         self.history = []
 
-    def load_gif(self):
-        file_name = self.exercise_gifs[self.getExerciseValue()]
-        return [PhotoImage(master=self.master, file=file_name, format='gif -index %i' % i) for i in range(self.exercise_gifs_length[self.getExerciseValue()])]
+    def load_gif_by_value(self,value):
+        file_name = self.exercise_gifs[value]
+        return [PhotoImage(master=self.master, file=file_name, format='gif -index %i' % i) for i in range(self.exercise_gifs_length[value])]
 
     def run(self):
         if self.isRunning.get():
@@ -77,8 +78,8 @@ class GuiLogic:
     def update_gif(self, ind, prev_image):
         if prev_image != self.getExerciseValue():
             prev_image = self.getExerciseValue()
-            self.frames = self.load_gif()
             ind = 0
+            self.frames = self.gifs_dict[self.getExerciseValue()]
         frame = self.frames[ind]
         ind = (ind + 1)%self.exercise_gifs_length[prev_image]
         self.label.configure(image=frame)
