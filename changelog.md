@@ -119,5 +119,7 @@
 
 
 # 04-24-2019 Both:
+- Created gifs to demonstrate exercises
+- Improved gif player by loading gifs upfront to improve user experience
 - New Update Video. https://youtu.be/SHYXmsq61LU
 
