@@ -122,4 +122,7 @@
 - Created gifs to demonstrate exercises
 - Improved gif player by loading gifs upfront to improve user experience
 - New Update Video. https://youtu.be/SHYXmsq61LU
+    
+# 04-30-2019 Garrett Sippel:
+- GUI will now diplay results of the set
 
