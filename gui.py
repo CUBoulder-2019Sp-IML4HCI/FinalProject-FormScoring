@@ -39,13 +39,28 @@ class GuiLogic:
         self.frames = self.gifs_dict[self.getExerciseValue()]
         self.label = Label(self.master)
         self.label.pack()
-        self.rep_text = Label(self.master, text = "Number of Reps" )
-        self.rep_text.pack()
-        self.reps_entry = Entry(self.master)
-        self.reps_entry.insert(END, '5')
-        self.reps_entry.pack()
+        #self.rep_text = Label(self.master, text = "Number of Reps" )
+        #self.rep_text.pack()
+        #self.reps_entry = Entry(self.master)
+        #self.reps_entry.insert(END, '5')
+        #self.reps_entry.pack()
         self.history = []
 
+        self.good_counts = IntVar(self.master,0)
+        self.half_counts = IntVar(self.master,0)
+        self.pronation_counts = IntVar(self.master,0)
+
+        self.good_rep_mesg = StringVar(self.master, value= "Good Reps Counted: %i" % self.good_counts.get())
+        self.half_rep_mesg = StringVar(self.master, value="Half Reps Counted: %i" % self.half_counts.get())
+        self.pronation_rep_mesg = StringVar(self.master, value="Failures to Pronate Counted: %i" % self.pronation_counts.get())
+
+        self.good_rep_disp = Label(self.master,textvariable = self.good_rep_mesg)
+        self.half_rep_disp = Label(self.master, textvariable= self.half_rep_mesg)
+        self.pronation_rep_disp = Label(self.master, textvariable=self.pronation_rep_mesg)
+
+        self.good_rep_disp.pack()
+        self.half_rep_disp.pack()
+        self.pronation_rep_disp.pack()
     def load_gif_by_value(self,value):
         file_name = self.exercise_gifs[value]
         return [PhotoImage(master=self.master, file=file_name, format='gif -index %i' % i) for i in range(self.exercise_gifs_length[value])]
@@ -100,7 +115,9 @@ class GuiLogic:
         print(self.history)
 
     def analyze_set(self):
-        reps = int(self.reps_entry.get())
+        self.good_counts.set(0)
+        self.half_counts.set(0)
+        self.pronation_counts.set(0)
         good_reps_counted = 0
         half_reps_counted = 0
         pronation_reps_counted = 0
@@ -111,7 +128,16 @@ class GuiLogic:
                 pronation_reps_counted += 1
             elif input == 4:
                 half_reps_counted += 1
-        #half_reps_counted = half_reps_counted-good_reps_counted
+
+        half_reps_counted = abs(half_reps_counted-good_reps_counted)
+        self.good_counts.set(good_reps_counted)
+        self.half_counts.set(half_reps_counted)
+        self.pronation_counts.set(pronation_reps_counted)
+
+        self.good_rep_mesg.set("Good Reps Counted: %i" % self.good_counts.get())
+        self.half_rep_mesg.set("Half Reps Counted: %i" % self.half_counts.get())
+        self.pronation_rep_mesg.set("Failures to Pronate Counted: %i" % self.pronation_counts.get())
+
         print("good_reps", good_reps_counted)
         print("half_reps", half_reps_counted)
         print("pronation_reps", pronation_reps_counted)
