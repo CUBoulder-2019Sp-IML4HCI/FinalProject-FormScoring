@@ -1,16 +1,11 @@
-import argparse
 from pythonosc import dispatcher
 from pythonosc import osc_server
 import threading
 from tkinter import *
-import _pickle as p
-import os
 import serial
 from pythonosc import udp_client
 import os
 
-
-#520 345
 
 class GuiLogic:
     def __init__(self):
