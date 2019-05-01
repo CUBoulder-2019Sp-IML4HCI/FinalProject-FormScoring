@@ -124,13 +124,17 @@ class GuiLogic:
             elif input == 4:
                 half_reps_counted += 1
 
-        half_reps_counted = half_reps_counted - good_reps_counted
-        if half_reps_counted < 0:
-            half_reps_counted = 0
+        #half_reps_counted = half_reps_counted - good_reps_counted
+        #if half_reps_counted < 0:
+        #    half_reps_counted = 0
 
         self.good_counts.set(good_reps_counted)
         self.half_counts.set(half_reps_counted)
         self.pronation_counts.set(pronation_reps_counted)
+
+        self.good_counts.set(1)
+        self.half_counts.set(1)
+        self.pronation_counts.set(1)
 
         self.good_rep_mesg.set("Good Reps Counted: %i" % self.good_counts.get())
         self.half_rep_mesg.set("Half Reps Counted: %i" % self.half_counts.get())
