@@ -46,7 +46,7 @@ The third and final iteration of the glove constrained the microbit with the aux
 #### Armband Design
 The first iteration of the upper arm mount used a compression sleeve cut to a band about 4” wide as a base, and nylon chicago screws to affix the microbit. 
 
-What we learned: The chicago screws are not very comfortable when pressed against the upper arm (even when the smooth side is facing the skin), and the batter pack is heavy enough that securing it in place is problematic. It is very easy to create an overly-restrictive arm cuff, which is neither comfortable nor safe in use.
+What we learned: The chicago screws are not very comfortable when pressed against the upper arm (even when the smooth side is facing the skin), and the battery pack is heavy enough that securing it in place is problematic. It is very easy to create an overly-restrictive arm cuff, which is neither comfortable nor safe in use.
 
 The second iteration of the arm band used a longer section of a compression sleeve in order to increase the contact area without increasing the tension of the cuff, and fine stitching to affix the microbit to the sleeve to avoid abbrading the upper arm.
 
