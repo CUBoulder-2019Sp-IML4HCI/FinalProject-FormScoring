@@ -73,11 +73,11 @@ Much of the orientation sensitivity testing was used as an evaluation metric for
 
 
 
-##### Roll Test: Place a carpenters speed square on a table such that the square rests on one of the short edges, and the long edge rises from left to right. Put on the microbit glove and place your hand palm-down on the table. Start recording the feed, and pronate your wrist such that the plane of your palm is parallel with the long edge of the square, then return hand to table. This set of action is meant to standardize the testing of roll (wrist rotation in this case).
+Roll Test: Place a carpenters speed square on a table such that the square rests on one of the short edges, and the long edge rises from left to right. Put on the microbit glove and place your hand palm-down on the table. Start recording the feed, and pronate your wrist such that the plane of your palm is parallel with the long edge of the square, then return hand to table. This set of action is meant to standardize the testing of roll (wrist rotation in this case).
 
-##### Pitch Test: Place a carpenters speed square on a table such that the square rests on one of the short edges, and the long edge rises from proximal to distal to you. Put on the microbit glove and place your hand palm-down on the table. Start recording the feed, and tilt your wrist/hand such that the plane of your palm is parallel with the long edge of the square, then return wrist/hand to table. This set of action is meant to standardize the testing of pitch (tilt of the wrist/hand in this case).
+Pitch Test: Place a carpenters speed square on a table such that the square rests on one of the short edges, and the long edge rises from proximal to distal to you. Put on the microbit glove and place your hand palm-down on the table. Start recording the feed, and tilt your wrist/hand such that the plane of your palm is parallel with the long edge of the square, then return wrist/hand to table. This set of action is meant to standardize the testing of pitch (tilt of the wrist/hand in this case).
 
-##### Yaw Test: Place a carpenters speed square on a table such that the lip of the square references the edge of the table proximal to you, and such that the left end of the long edge is more proximal to you than the right end.  Put on the microbit glove and place your hand on the square such that you middle finger is touching the the distal corner of the square, and your middle finger is parallel with the right edge. Start recording the feed, and tilt your wrist/hand such that your middle finger is parallel with the long edge of the square, then return wrist/hand to starting position. This set of action is meant to standardize the testing of yaw.
+Yaw Test: Place a carpenters speed square on a table such that the lip of the square references the edge of the table proximal to you, and such that the left end of the long edge is more proximal to you than the right end.  Put on the microbit glove and place your hand on the square such that you middle finger is touching the the distal corner of the square, and your middle finger is parallel with the right edge. Start recording the feed, and tilt your wrist/hand such that your middle finger is parallel with the long edge of the square, then return wrist/hand to starting position. This set of action is meant to standardize the testing of yaw.
 
 Roll, Pitch, Yaw Results: The best orientation of the microbit relative to the glove is with the edge of auxiliary pins parallel to the knuckles, and the side with the power input facing the skin.
 
@@ -107,7 +107,7 @@ This project has always involved a concern that the user might not know proper f
 GitHub Repo: https://github.com/CUBoulder-2019Sp-IML4HCI/FinalProject-FormScoring
 
 #### Python:
-Anaconda Python Platform: https://www.anaconda.com/distribution/
+Anaconda Python Platform: https://www.anaconda.com/distribution/  
 Python-OSC Package: https://pypi.org/project/python-osc/
 
 #### Mirobit:
