@@ -127,5 +127,5 @@
 - GUI will now diplay results of the set
 
 # 05-01-2019 Both:
-Final Video: https://youtu.be/Ze9NPAPZrT4
+- Final Video: https://youtu.be/Ze9NPAPZrT4
 
