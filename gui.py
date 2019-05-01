@@ -132,10 +132,6 @@ class GuiLogic:
         self.half_counts.set(half_reps_counted)
         self.pronation_counts.set(pronation_reps_counted)
 
-        self.good_counts.set(1)
-        self.half_counts.set(1)
-        self.pronation_counts.set(1)
-
         self.good_rep_mesg.set("Good Reps Counted: %i" % self.good_counts.get())
         self.half_rep_mesg.set("Half Reps Counted: %i" % self.half_counts.get())
         self.pronation_rep_mesg.set("Failures to Pronate Counted: %i" % self.pronation_counts.get())
