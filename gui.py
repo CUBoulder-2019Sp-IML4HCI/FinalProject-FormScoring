@@ -5,6 +5,7 @@ from tkinter import *
 import serial
 from pythonosc import udp_client
 import os
+import time
 
 
 class GuiLogic:
@@ -100,46 +101,116 @@ class GuiLogic:
 
     def receive_class(self,head):
         if head == "/output_1":
-            self.history.append(1)
+            self.history.append((1,time.time()))
         elif head == "/output_2":
-            self.history.append(2)
+            self.history.append((2, time.time()))
         elif head == "/output_3":
-            self.history.append(3)
+            self.history.append((3, time.time()))
         else:
-            self.history.append(4)
+            self.history.append((4, time.time()))
         print(self.history)
 
     def analyze_set(self):
+        delay = 2
         self.good_counts.set(0)
         self.half_counts.set(0)
         self.pronation_counts.set(0)
         good_reps_counted = 0
         half_reps_counted = 0
         pronation_reps_counted = 0
-        for input in self.history:
-            if input == 2:
-                good_reps_counted += 1
-            elif input == 3:
-                pronation_reps_counted += 1
-            elif input == 4:
-                half_reps_counted += 1
+        last_good = 0
+        good = [rep[1] for rep in self.history if rep[0] == 2]
+        half = [rep[1] for rep in self.history if rep[0] == 4]
+        true_half = []
+        pro = [rep[1] for rep in self.history if rep[0] == 3]
+        true_pro = []
+        for h in half:
+            flag = False
+            for g in good:
+                if abs(h - g) <= delay:
+                    flag = True
+            if not flag:
+                true_half.append(h)
+        for p in pro:
+            flag = False
+            for g in good:
+                if abs(p-g) <= delay:
+                    flag = True
+            if not flag:
+                true_pro.append(p)
 
-        #half_reps_counted = half_reps_counted - good_reps_counted
-        #if half_reps_counted < 0:
-        #    half_reps_counted = 0
-
-        self.good_counts.set(good_reps_counted)
-        self.half_counts.set(half_reps_counted)
-        self.pronation_counts.set(pronation_reps_counted)
+        self.good_counts.set(len(good))
+        self.half_counts.set(len(true_half))
+        self.pronation_counts.set(len(true_pro))
 
         self.good_rep_mesg.set("Good Reps Counted: %i" % self.good_counts.get())
         self.half_rep_mesg.set("Half Reps Counted: %i" % self.half_counts.get())
         self.pronation_rep_mesg.set("Failures to Pronate Counted: %i" % self.pronation_counts.get())
 
-        print("good_reps", good_reps_counted)
-        print("half_reps", half_reps_counted)
-        print("pronation_reps", pronation_reps_counted)
         self.history = []
+
+
+    """
+    def analyze_set(self):
+        delay = 2
+        self.good_counts.set(0)
+        self.half_counts.set(0)
+        self.pronation_counts.set(0)
+        good_reps_counted = 0
+        half_reps_counted = 0
+        pronation_reps_counted = 0
+        last_good = 0
+
+        for i in range(len(self.history)):
+            if self.history[i][0] == 2:
+                good_reps_counted += 1
+                last_good = self.history[i][1]
+            elif self.history[i][0] == 3:
+                start = i-2
+                if start<0:
+                    start = 0
+                flag = False
+                for j in range(start,len(self.history)):
+                    if self.history[j][0] == 2:
+                        t = abs(self.history[i][1] - self.history[j][1])
+                        print(t)
+                        if t > delay:
+                            pronation_reps_counted += 1
+                            flag = True
+                            break
+                if flag == False:
+                    pronation_reps_counted += 1
+                #t = abs(last_good - self.history[i][1])
+                #print(t)
+                #if t > 4:
+                #   pronation_reps_counted += 1
+            elif self.history[i][0] == 4:
+                start = i-2
+                if start<0:
+                    start = 0
+                flag = False
+                for j in range(start,len(self.history)):
+                    if self.history[j][0] == 2:
+                        t = abs(self.history[i][1] - self.history[j][1])
+                        print(t)
+                        if t > delay:
+                            half_reps_counted += 1
+                            flag = True
+                            break
+                if flag == False:
+                    half_reps_counted += 1
+                #t = abs(last_good - self.history[i][1])
+                #print(t)
+                #if t > 4:
+                #   half_reps_counted += 1
+                
+
+        #half_reps_counted = half_reps_counted - good_reps_counted
+        #if half_reps_counted < 0:
+        #    half_reps_counted = 0
+        """
+
+
 
 
 
