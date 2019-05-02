@@ -71,7 +71,7 @@ The glove did a great job constraining the microbit, and the accelerometer value
 Much of the orientation sensitivity testing was used as an evaluation metric for the final design of the glove, and so a standard procedure set was created. The procedures were as follows:
  [The following procedures assume the usage of the left hand]
 
-![Ikea-Style Diagram of Roll, Pitch, and Yaw Testing](https://github.com/CUBoulder-2019Sp-IML4HCI/FinalProject-FormScoring/blob/master/img/roll_pitch_yaw_diagram.png)
+![Ikea-Style Diagram of Roll, Pitch, and Yaw Testing](https://github.com/CUBoulder-2019Sp-IML4HCI/FinalProject-FormScoring/blob/master/img/roll_pitch_yaw_diagram.png)  
 (Diagram created using components from the following sources: shorturl.at/stBDI, shorturl.at/eijX5)
 
 Roll Test: Place a carpenters speed square on a table such that the square rests on one of the short edges, and the long edge rises from left to right. Put on the microbit glove and place your hand palm-down on the table. Start recording the feed, and pronate your wrist such that the plane of your palm is parallel with the long edge of the square, then return hand to table. This set of action is meant to standardize the testing of roll (wrist rotation in this case).
