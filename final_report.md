@@ -12,11 +12,11 @@ Understanding the Curl: A standard bicep curl has 2 primary modes of failure: fa
 
 Interactive User Accessories: The user will wear a glove and an armband equipped with microbits to track the motion of the arm in 3D space. These accessories capture motion data specific to the user, and safely track user motion without impeding circulation or range of motion.
 
-[Insert image of user acessories]
+![Image of Glove and Armband Acessories](https://github.com/CUBoulder-2019Sp-IML4HCI/FinalProject-FormScoring/blob/master/accessories.png)
 
 Interactive User Training: The user must train 4 states for a bicep curl model: a still (the state reached in between/at the bottom of a rep), a rep with proper form (full range of motion and pronation of the wrist), a rep with pronation failure, and a half rep.
 
-[Insert image of UI]
+![Image of GUI](https://github.com/CUBoulder-2019Sp-IML4HCI/FinalProject-FormScoring/blob/master/gui_pic.PNG)
 
 In order to guide the user through the training process, an animation of a trainer performing the exercise and each failure mode will be displayed based on what the user has selected to train. Id est, if the user selects to train pronation failure, an animation of a rep that fails to pronate the wrist will be played.
 
